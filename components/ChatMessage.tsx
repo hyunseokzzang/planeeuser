@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Message, Sender } from '../types';
+import { Message, Sender, AnalysisStep } from '../types';
 import SourceCard from './SourceCard';
 
 interface ChatMessageProps {
@@ -34,7 +34,7 @@ const ImageWithSkeleton: React.FC<{ src: string; alt: string; className?: string
   );
 };
 
-const AnalysisStepper: React.FC<{ steps: any[] }> = ({ steps }) => (
+const AnalysisStepper: React.FC<{ steps: AnalysisStep[] }> = ({ steps }) => (
   <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 no-scrollbar animate-in fade-in slide-in-from-top-1 duration-300">
     {steps.map((step, idx) => (
       <React.Fragment key={idx}>
@@ -121,7 +121,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
   }, [isAI, isTypingFinished, message.content]);
 
   const isLongText = message.content.length > 400;
-  const shouldShowStepper = isAI && aiData?.analysisSteps && !isTypingFinished && !aiData?.noInformation;
+  const shouldShowStepper = isAI && !!aiData?.analysisSteps && !isTypingFinished && !aiData?.noInformation;
 
   return (
     <div className={`flex w-full mb-3 ${isAI ? 'justify-start' : 'justify-end'}`}>
@@ -147,9 +147,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
             : 'bg-blue-600 text-white rounded-tr-none shadow-md px-4 py-3'
           }
         `}>
-          {/* AI 답변 본문 박스 */}
           <div className={`${isAI && !aiData?.noInformation ? 'p-5 pb-5' : ''}`}>
-            {shouldShowStepper && <AnalysisStepper steps={aiData.analysisSteps} />}
+            {shouldShowStepper && aiData?.analysisSteps && <AnalysisStepper steps={aiData.analysisSteps} />}
 
             <div 
               className="relative overflow-hidden" 
@@ -207,7 +206,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
             {isAI && isTypingFinished && aiData?.images && <ImageGrid images={aiData.images} />}
           </div>
 
-          {/* Verification Sources (배경 및 깊이감 개선) */}
           {isAI && isTypingFinished && !aiData?.noInformation && aiData?.sources && aiData.sources.length > 0 && (
             <div className="bg-[#F8FAFC] border-t border-gray-100 px-5 py-5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] animate-in fade-in slide-in-from-bottom-1 duration-500 delay-300">
               <div className="flex items-center gap-2 mb-3">
@@ -223,7 +221,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
           )}
         </div>
 
-        {/* Follow-up 질문들 */}
         {isAI && isTypingFinished && aiData?.recommendedQuestions && aiData.recommendedQuestions.length > 0 && (
           <div className="mt-4 ml-1 animate-in fade-in slide-in-from-top-1 duration-500 delay-500">
             <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Follow-ups</p>

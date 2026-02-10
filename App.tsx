@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ChatMessage from './components/ChatMessage';
+import UserFlowModal from './components/UserFlowModal';
 import { generateAIResponse } from './services/geminiService';
 import { Message, Sender } from './types';
 
@@ -44,7 +45,6 @@ const ThinkingLoader = () => {
   );
 };
 
-// 통합된 추천 질문 데이터
 const INITIAL_RECOMMENDATIONS = [
   {
     title: "복지 포인트 사용 기한",
@@ -55,7 +55,6 @@ const INITIAL_RECOMMENDATIONS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    type: "IMAGES_TEST"
   },
   {
     title: "신규 프로젝트 기안",
@@ -66,7 +65,6 @@ const INITIAL_RECOMMENDATIONS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    type: "TEXT_ONLY_TEST"
   },
   {
     title: "사내 시설 예약 방법",
@@ -77,7 +75,6 @@ const INITIAL_RECOMMENDATIONS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     ),
-    type: "TEXT_ONLY_TEST"
   },
   {
     title: "소프트웨어 신청",
@@ -88,7 +85,6 @@ const INITIAL_RECOMMENDATIONS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
       </svg>
     ),
-    type: "TEXT_ONLY_TEST"
   }
 ];
 
@@ -97,6 +93,7 @@ const App: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showDefaultQuestions, setShowDefaultQuestions] = useState(false);
+  const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -116,7 +113,6 @@ const App: React.FC = () => {
     setIsTyping(true);
 
     try {
-      // 젬마 서비스로 전달 시 키워드 매칭을 통해 IMAGES_TEST 등이 나오도록 유도
       const aiResult = await generateAIResponse(content, []);
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -174,7 +170,16 @@ const App: React.FC = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsFlowModalOpen(true)}
+            className="px-4 py-2.5 text-[11px] font-black text-gray-500 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100 transition-all active:scale-95 flex items-center gap-2"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 20l-5.447-2.724A2 2 0 013 15.488V5.512a2 2 0 011.553-1.944L9 2l5.447 2.724A2 2 0 0115 6.512v9.976a2 2 0 01-1.553 1.944L9 20z" />
+            </svg>
+            User Flow
+          </button>
           <button 
             onClick={resetSession}
             className="px-5 py-2.5 text-[11px] font-black text-white bg-black rounded-xl hover:bg-gray-800 transition-all shadow-xl active:scale-95"
@@ -294,6 +299,8 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      <UserFlowModal isOpen={isFlowModalOpen} onClose={() => setIsFlowModalOpen(false)} />
     </div>
   );
 };
