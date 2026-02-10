@@ -58,12 +58,12 @@ export const generateAIResponse = async (
   prompt: string, 
   history: any[]
 ): Promise<AIResponse> => {
-  // 실제 AI 응답을 시뮬레이션하기 위한 지연
-  await wait(1800);
+  // 실제 AI 응답을 시뮬레이션하기 위한 지연 시간 소폭 증가 (1.8s -> 2.5s)
+  await wait(2500);
 
   const cleanPrompt = prompt.trim();
 
-  // 1. 특정 키워드에 따른 응답 분기 (복구된 부분)
+  // 1. 특정 키워드에 따른 응답 분기
   if (cleanPrompt.includes("복지 포인트") || cleanPrompt.includes("이미지 3개")) {
     return MOCK_RESPONSES.IMAGES_TEST;
   }

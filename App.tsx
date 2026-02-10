@@ -26,8 +26,8 @@ const ThinkingLoader = () => {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 mb-20 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="w-10 h-10 rounded-2xl bg-black flex items-center justify-center shadow-lg relative overflow-hidden">
+    <div className="flex items-center gap-3 py-6">
+      <div className="w-10 h-10 rounded-2xl bg-black flex items-center justify-center shadow-lg relative overflow-hidden shrink-0">
         <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-transparent animate-pulse" />
         <div className="flex gap-1 z-10">
           <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
@@ -35,9 +35,9 @@ const ThinkingLoader = () => {
           <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" />
         </div>
       </div>
-      <div className="px-5 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+      <div className="px-5 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col min-w-[180px]">
         <span className="text-[10px] font-black text-blue-600 tracking-[0.2em] uppercase mb-0.5">Deep Reasoning</span>
-        <span className="text-[12px] font-bold text-gray-500 transition-all duration-500">
+        <span className="text-[12px] font-bold text-gray-500">
           {phases[phase]}{dots}
         </span>
       </div>
@@ -94,17 +94,20 @@ const App: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showDefaultQuestions, setShowDefaultQuestions] = useState(false);
   const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight });
     }
   }, [messages, isTyping]);
 
   const handleSendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isTyping) return;
+    
+    if (!isInitialized) setIsInitialized(true);
     
     const userMsg: Message = { id: Date.now().toString(), sender: Sender.USER, content, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
@@ -133,7 +136,7 @@ const App: React.FC = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping]);
+  }, [isTyping, isInitialized]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -151,6 +154,7 @@ const App: React.FC = () => {
   };
 
   const resetSession = () => {
+    setIsInitialized(false);
     setMessages([]);
     setInputValue('');
     setIsTyping(false);
@@ -190,10 +194,10 @@ const App: React.FC = () => {
       </header>
 
       <main ref={scrollRef} className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/20">
-        <div className="max-w-4xl mx-auto w-full px-6 py-10 min-h-full flex flex-col">
-          {messages.length === 0 ? (
+        <div className="max-w-4xl mx-auto w-full px-6 py-10 min-h-full flex flex-col relative">
+          {!isInitialized ? (
             <div className="flex-1 flex flex-col items-center justify-center py-10">
-              <div className="text-center mb-12 animate-in fade-in slide-in-from-top-4 duration-1000">
+              <div className="text-center mb-12">
                 <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-blue-200 mx-auto">
                   <span className="text-white text-2xl font-black">P</span>
                 </div>
@@ -201,12 +205,12 @@ const App: React.FC = () => {
                 <p className="text-gray-400 text-[14px] font-bold">궁금한 내용을 입력하거나 아래 추천 질문을 선택해 보세요.</p>
               </div>
               
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                  {INITIAL_RECOMMENDATIONS.map((item, idx) => (
                    <button 
                     key={idx}
                     onClick={() => handleSendMessage(item.question)}
-                    className="p-6 bg-white border border-gray-100 rounded-3xl hover:shadow-2xl hover:border-blue-500 hover:-translate-y-1 transition-all text-left flex items-start gap-5 group shadow-sm"
+                    className="p-6 bg-white border border-gray-100 rounded-3xl hover:shadow-2xl hover:border-blue-500 transition-all text-left flex items-start gap-5 group shadow-sm"
                    >
                      <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
                         {item.icon}
@@ -227,7 +231,7 @@ const App: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="space-y-6 pb-20">
+            <div className="space-y-6 pb-12">
               {messages.map((msg) => (
                 <ChatMessage key={msg.id} message={msg} onRecommendedClick={handleSendMessage} onReset={resetSession} />
               ))}
@@ -240,7 +244,7 @@ const App: React.FC = () => {
       <footer className="px-6 py-8 bg-white border-t border-gray-50 z-50">
         <div className="max-w-4xl mx-auto relative">
           {showDefaultQuestions && (
-            <div className="absolute bottom-full mb-4 left-0 w-full max-w-md bg-white rounded-3xl border border-gray-100 shadow-2xl p-4 animate-in fade-in slide-in-from-bottom-4 duration-300 z-[60]">
+            <div className="absolute bottom-full mb-4 left-0 w-full max-w-md bg-white rounded-3xl border border-gray-100 shadow-2xl p-4 z-[60]">
               <div className="flex items-center gap-2 mb-3 px-2">
                 <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
@@ -292,9 +296,13 @@ const App: React.FC = () => {
                 inputValue.trim() && !isTyping ? 'bg-blue-600 text-white shadow-blue-200 shadow-xl' : 'bg-gray-100 text-gray-300'
               }`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
+              {isTyping ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
