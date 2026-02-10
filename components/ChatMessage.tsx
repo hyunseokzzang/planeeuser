@@ -15,10 +15,10 @@ const ImageWithSkeleton: React.FC<{ src: string; alt: string; className?: string
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className={`relative rounded-xl overflow-hidden border border-gray-100 bg-gray-50 ${className}`}>
+    <div className={`relative rounded-lg overflow-hidden border border-gray-100 bg-gray-50 ${className}`}>
       {!isLoaded && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-          <svg className="w-6 h-6 text-gray-200 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
@@ -28,7 +28,7 @@ const ImageWithSkeleton: React.FC<{ src: string; alt: string; className?: string
         alt={alt}
         loading="lazy"
         onLoad={() => setIsLoaded(true)}
-        className={`w-full h-full object-cover transition-opacity duration-300 hover:scale-105 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`w-full h-full object-cover ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
       />
     </div>
   );
@@ -42,12 +42,12 @@ const AnalysisStepper: React.FC<{ steps?: AnalysisStep[] }> = ({ steps }) => {
       {steps.map((step, idx) => (
         <React.Fragment key={idx}>
           <div className="flex items-center gap-1.5 shrink-0">
-            <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7px] font-bold transition-colors duration-500 ${
+            <div className={`w-3.5 h-3.5 rounded-md flex items-center justify-center text-[7px] font-bold ${
               step.status === 'complete' ? 'bg-green-500 text-white shadow-sm' : 'bg-blue-100 text-blue-600 animate-pulse'
             }`}>
               {step.status === 'complete' ? '✓' : idx + 1}
             </div>
-            <span className={`text-[9px] font-bold tracking-tight whitespace-nowrap transition-colors duration-500 ${
+            <span className={`text-[9px] font-bold tracking-tight whitespace-nowrap ${
               step.status === 'complete' ? 'text-gray-400' : 'text-blue-600'
             }`}>
               {step.label}
@@ -111,8 +111,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
       const typeNextChar = () => {
         setVisibleCharsCount(prev => {
           if (prev < message.content.length) {
-            // 타이핑 속도를 지연시켜 노출 속도 조절 (기존 2ms -> 25ms)
-            timerRef.current = window.setTimeout(typeNextChar, 25);
+            // 답변 속도를 더욱 신속하게 조정 (8ms -> 5ms)
+            timerRef.current = window.setTimeout(typeNextChar, 5);
             return prev + 1;
           } else {
             setIsTypingFinished(true);
@@ -134,29 +134,29 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
         
         {isAI && (
           <div className="flex items-center gap-2 mb-2 ml-1">
-            <div className="w-5 h-5 rounded-lg bg-black flex items-center justify-center shadow-md">
+            <div className="w-5 h-5 rounded-md bg-black flex items-center justify-center shadow-md">
               <span className="text-[8px] text-white font-black">PL</span>
             </div>
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
               {aiData?.noInformation ? 'System Alert' : 'Analysis Result'}
             </span>
           </div>
         )}
 
         <div className={`
-          relative rounded-[32px] text-[14px] leading-relaxed overflow-hidden
+          relative text-[14px] leading-relaxed overflow-hidden box-border
           ${isAI 
             ? aiData?.noInformation 
-              ? 'bg-gray-50 border-dashed border-2 border-gray-200 text-gray-500 shadow-none p-6' 
-              : 'bg-white border border-gray-100 shadow-sm text-gray-800' 
-            : 'bg-blue-600 text-white rounded-tr-none shadow-lg shadow-blue-100 px-5 py-4'
+              ? 'bg-gray-50 border-dashed border-2 border-gray-200 text-gray-500 shadow-none p-6 rounded-xl' 
+              : 'bg-white border border-gray-100 shadow-sm text-gray-800 rounded-xl' 
+            : 'bg-blue-600 text-white shadow-lg shadow-blue-100 px-5 py-2 min-h-[40px] flex items-center rounded-xl rounded-tr-none'
           }
         `}>
           <div className={`${isAI && !aiData?.noInformation ? 'p-6 pb-6' : ''}`}>
             {shouldShowStepper && <AnalysisStepper steps={aiData?.analysisSteps} />}
 
             <div 
-              className="relative overflow-hidden transition-[height] duration-500 ease-in-out" 
+              className="relative overflow-hidden" 
               style={{ height: (isAI && isLongText && !isExpanded && isTypingFinished) ? COLLAPSED_HEIGHT : 'auto' }}
             >
               <div className="whitespace-pre-wrap break-words">
@@ -176,7 +176,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
             {isAI && isTypingFinished && isLongText && (
               <button 
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="mt-4 flex items-center gap-1.5 text-[10px] font-black text-blue-600 hover:text-blue-800 transition-colors uppercase tracking-tight w-fit px-4 py-2 bg-blue-50 rounded-xl relative z-10 hover:bg-blue-100 active:scale-95"
+                className="mt-4 flex items-center gap-1.5 text-[10px] font-black text-blue-600 hover:text-blue-800 transition-colors uppercase tracking-tight w-fit px-4 py-2 bg-blue-50 rounded-lg relative z-10 hover:bg-blue-100 active:scale-95"
               >
                 {isExpanded ? (
                   <><span>간략히 보기</span><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" /></svg></>
@@ -188,23 +188,23 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
 
             {isAI && isTypingFinished && aiData?.noInformation && (
               <div className="mt-4 flex flex-col gap-2">
-                <button className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl text-[13px] shadow-lg shadow-blue-100 active:scale-95 transition-all flex items-center justify-center gap-2">
+                <button className="w-full py-4 bg-blue-600 text-white font-black rounded-lg text-[13px] shadow-lg shadow-blue-100 active:scale-95 transition-all flex items-center justify-center gap-2">
                   인재개발팀 1:1 문의 채널 연결
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                 </button>
-                <button onClick={onReset} className="w-full py-4 bg-white border border-gray-200 text-gray-600 font-black rounded-2xl text-[13px] active:scale-95 transition-all hover:bg-gray-50">
+                <button onClick={onReset} className="w-full py-4 bg-white border border-gray-200 text-gray-600 font-black rounded-lg text-[13px] active:scale-95 transition-all hover:bg-gray-50">
                   검색어 초기화 및 다시 입력
                 </button>
               </div>
             )}
 
             {isAI && isTypingFinished && aiData?.summary && !aiData.noInformation && (
-              <div className="mt-6 p-5 bg-blue-50/40 rounded-3xl border border-blue-100/30">
+              <div className="mt-6 p-5 bg-blue-50/40 rounded-xl border border-blue-100/30">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-1.5 h-3 bg-blue-400 rounded-full" />
-                  <span className="text-[9px] font-black text-blue-600 uppercase tracking-tighter">Summary</span>
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em]">Summary</span>
                 </div>
-                <p className="text-[12px] text-blue-900 font-bold leading-relaxed">{aiData.summary}</p>
+                <p className="text-[11px] text-blue-900 font-bold leading-relaxed">{aiData.summary}</p>
               </div>
             )}
 
@@ -219,7 +219,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
                 </svg>
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">Verification Sources</span>
               </div>
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex flex-wrap gap-2">
                 {aiData.sources.map((s) => <SourceCard key={s.id} source={s} />)}
               </div>
             </div>
@@ -227,14 +227,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
         </div>
 
         {isAI && isTypingFinished && aiData?.recommendedQuestions && aiData.recommendedQuestions.length > 0 && (
-          <div className="mt-5 ml-1">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">Follow-ups</p>
-            <div className="flex flex-wrap gap-2">
+          <div className="mt-4 ml-1">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2 ml-1">Follow-ups</p>
+            <div className="flex flex-wrap gap-1.5">
               {aiData.recommendedQuestions.map((q, i) => (
                 <button
                   key={i}
                   onClick={() => onRecommendedClick(q)}
-                  className="px-5 py-2.5 bg-white border border-gray-100 rounded-2xl text-[11px] text-gray-600 font-bold hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95 hover:shadow-md"
+                  className="px-3.5 py-1.5 bg-white border border-gray-100 rounded-lg text-[11px] text-gray-600 font-bold hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95 hover:shadow-md"
                 >
                   {q}
                 </button>

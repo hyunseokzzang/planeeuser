@@ -58,8 +58,9 @@ export const generateAIResponse = async (
   prompt: string, 
   history: any[]
 ): Promise<AIResponse> => {
-  // 실제 AI 응답을 시뮬레이션하기 위한 지연 시간 소폭 증가 (1.8s -> 2.5s)
-  await wait(2500);
+  // ReasoningProgress 시각화 단계를 모두 충분히 보여주기 위해 지연 시간을 약 7.5초로 상향 조정
+  // 1.8 + 2.2 + 1.5 + 1.2 = 6.7초 + 단계별 전환 딜레이(0.4초 * 3) = 약 7.9초
+  await wait(7900);
 
   const cleanPrompt = prompt.trim();
 

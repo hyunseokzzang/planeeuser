@@ -19,13 +19,13 @@ const UserFlowModal: React.FC<UserFlowModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="p-8 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-black text-gray-900 tracking-tighter">User Flow 설계도</h2>
             <p className="text-gray-400 text-sm font-bold mt-1">Plannie AI가 제공하는 신뢰 기반 대화 흐름</p>
           </div>
-          <button onClick={onClose} className="p-3 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+          <button onClick={onClose} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -39,7 +39,7 @@ const UserFlowModal: React.FC<UserFlowModalProps> = ({ isOpen, onClose }) => {
                 {idx < steps.length - 1 && (
                   <div className="absolute left-[20px] top-[40px] w-0.5 h-[calc(100%-20px)] bg-blue-100" />
                 )}
-                <div className="w-10 h-10 rounded-2xl bg-white border border-blue-100 flex items-center justify-center shrink-0 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <div className="w-10 h-10 rounded-lg bg-white border border-blue-100 flex items-center justify-center shrink-0 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
                   <span className="text-sm font-black">{idx + 1}</span>
                 </div>
                 <div className="pt-1">
