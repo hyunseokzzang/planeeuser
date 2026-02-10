@@ -34,27 +34,32 @@ const ImageWithSkeleton: React.FC<{ src: string; alt: string; className?: string
   );
 };
 
-const AnalysisStepper: React.FC<{ steps: AnalysisStep[] }> = ({ steps }) => (
-  <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 no-scrollbar animate-in fade-in slide-in-from-top-1 duration-300">
-    {steps.map((step, idx) => (
-      <React.Fragment key={idx}>
-        <div className="flex items-center gap-1.5 shrink-0">
-          <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7px] font-bold ${
-            step.status === 'complete' ? 'bg-green-500 text-white' : 'bg-blue-100 text-blue-600 animate-pulse'
-          }`}>
-            {step.status === 'complete' ? '✓' : idx + 1}
+// steps 프롭을 선택적(optional)으로 변경하여 undefined 에러 방지
+const AnalysisStepper: React.FC<{ steps?: AnalysisStep[] }> = ({ steps }) => {
+  if (!steps || steps.length === 0) return null;
+
+  return (
+    <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 no-scrollbar animate-in fade-in slide-in-from-top-1 duration-300">
+      {steps.map((step, idx) => (
+        <React.Fragment key={idx}>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7px] font-bold ${
+              step.status === 'complete' ? 'bg-green-500 text-white' : 'bg-blue-100 text-blue-600 animate-pulse'
+            }`}>
+              {step.status === 'complete' ? '✓' : idx + 1}
+            </div>
+            <span className={`text-[9px] font-bold tracking-tight whitespace-nowrap ${
+              step.status === 'complete' ? 'text-gray-400' : 'text-blue-600'
+            }`}>
+              {step.label}
+            </span>
           </div>
-          <span className={`text-[9px] font-bold tracking-tight whitespace-nowrap ${
-            step.status === 'complete' ? 'text-gray-400' : 'text-blue-600'
-          }`}>
-            {step.label}
-          </span>
-        </div>
-        {idx < steps.length - 1 && <div className="w-3 h-px bg-gray-100 shrink-0" />}
-      </React.Fragment>
-    ))}
-  </div>
-);
+          {idx < steps.length - 1 && <div className="w-3 h-px bg-gray-100 shrink-0" />}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+};
 
 const ImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
   if (!images || images.length === 0) return null;
@@ -121,6 +126,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
   }, [isAI, isTypingFinished, message.content]);
 
   const isLongText = message.content.length > 400;
+  // logic 최적화: shouldShowStepper가 true일 때만 AnalysisStepper를 명시적으로 렌더링
   const shouldShowStepper = isAI && !!aiData?.analysisSteps && !isTypingFinished && !aiData?.noInformation;
 
   return (
@@ -148,7 +154,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onRecommendedClick, 
           }
         `}>
           <div className={`${isAI && !aiData?.noInformation ? 'p-5 pb-5' : ''}`}>
-            {shouldShowStepper && aiData?.analysisSteps && <AnalysisStepper steps={aiData.analysisSteps} />}
+            {shouldShowStepper && <AnalysisStepper steps={aiData?.analysisSteps} />}
 
             <div 
               className="relative overflow-hidden" 
